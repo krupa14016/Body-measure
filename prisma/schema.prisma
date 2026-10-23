@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Submission {
+  id               String        @id @default(cuid())
+  clientName       String?
+  heightCm         Float
+  unit             String        @default("cm")
+  genderPreference String        @default("unisex")
+  modelVersion     String?       @default("tailor-ai-1.0.0-lite")
+  measurements     Measurement[]
+  createdAt        DateTime      @default(now())
+}
+
+model Measurement {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  key          String
+  valueCm      Float
+  method       String?
+  quality      String?
+  notes        String?
+
+  @@unique([submissionId, key])
+}
